@@ -1,0 +1,510 @@
+Practical 1 Install Git and configure identity
+
+Aim: Install Git for Windows and configure the identity recorded in commits.
+
+Procedure
+1.	Visit https://git-scm.com/downloads/win and download Git for Windows. 
+2.	Run the installer. 
+3.	Keep Git Credential Manager enabled and select the PATH option that allows Git from the command line and third party software. 
+4.	Use the recommended Windows line ending option. 
+5.	Finish installation.
+6.	 Close and reopen Command Prompt, then check that Git is found.
+git --version
+where git
+7.	Configure your actual identity. A GitHub verified email or your GitHub no-reply email can be used.
+git config --global user.name "Student Name"
+git config --global user.email "student@example.com"
+git config --global init.defaultBranch main
+git config --global --list
+
+
+Practical 2 Create a repository and make commits
+
+Aim: Initialize a local repository, stage a file and record two commits.
+
+Procedure
+
+1. Create and enter the repository folder.
+cd /d D:\DevOpsLab
+mkdir git-journal
+cd git-journal
+git init
+git status
+2. Create the first file and examine status.
+echo My DevOps practical journal>README.md
+git status
+3. Stage and commit the file.
+git add README.md
+git diff --staged
+git commit -m "Add journal README"
+4. Add a second line and commit the update.
+echo Topics: Git GitHub Maven Jenkins>>README.md
+git diff
+git add README.md
+git commit -m "List journal topics"
+git log --oneline
+git status
+
+
+Practical 3 Inspect changes and ignore generated files
+
+Aim: Compare working and staged changes and use a .gitignore file.
+
+Procedure
+1. Create a generated-file folder and a text file.
+mkdir build
+echo temporary output>build\output.log
+echo Local note>draft.txt
+git status
+2. Open Notepad and save .gitignore in the repository root using Save as type All Files. Enter these lines:
+build/
+*.log
+.env
+3. Verify the ignore rule and compare a tracked change.
+git check-ignore -v build/output.log
+echo Inspecting changes>>README.md
+git diff
+git add README.md .gitignore draft.txt
+git diff --staged
+git commit -m "Add ignore rules and inspection notes"
+git show --stat HEAD
+
+
+Practical 4 Create a branch and merge a feature
+
+Aim: Develop a change in a feature branch and merge it into main.
+
+Procedure
+1. Verify that the working tree is clean, then create a feature branch.
+git status
+git switch -c feature-study-plan
+2. Add a feature file and commit it.
+echo Study Git before Jenkins>study-plan.txt
+git add study-plan.txt
+git commit -m "Add study plan"
+git branch
+3. Return to main. Confirm study-plan.txt is absent there before merging.
+git switch main
+dir
+git merge feature-study-plan
+git log --oneline --graph --all
+git branch -d feature-study-plan
+
+
+Practical 5 Resolve conflicts and undo practice changes
+
+Aim: Create a controlled merge conflict, resolve it, unstage and discard a temporary edit, and revert a commit.
+Procedure
+1. Create a shared baseline file.
+echo Course: DevOps>course.txt
+git add course.txt
+git commit -m "Add course baseline"
+git switch -c feature-course
+2. Change the same line on the feature branch.
+echo Course: DevOps with Git>course.txt
+git add course.txt
+git commit -m "Describe Git course"
+git switch main
+3. Change that line differently on main and attempt the merge.
+echo Course: DevOps with Jenkins>course.txt
+git add course.txt
+git commit -m "Describe Jenkins course"
+git merge feature-course
+git status
+4. Open course.txt in Notepad. Replace the entire conflict including marker lines with the following single line. Save, then complete the merge.
+Course: DevOps with Git and Jenkins
+git add course.txt
+git commit -m "Resolve course title conflict"
+git branch -d feature-course
+5. Create only this temporary README edit. Unstage it and then discard it. The second restore removes this uncommitted edit.
+echo Temporary lab edit>>README.md
+git add README.md
+git restore --staged README.md
+git diff
+git restore README.md
+git status
+6. Create an unwanted practice commit and reverse it without rewriting history.
+echo Incorrect practice entry>wrong.txt
+git add wrong.txt
+git commit -m "Add incorrect practice entry"
+git revert --no-edit HEAD
+git log --oneline -4
+git status
+
+
+
+
+Practical 6 Create a GitHub repository and push code
+
+Aim:Create a remote repository and publish the local Git history.
+
+Procedure
+1.	Open https://github.com, create or sign in to your account and verify your email. 
+2.	Select New repository. Name it git-journal. Choose public only if the files contain no sensitive content; otherwise choose private.
+3.	 Do not initialize it with README, .gitignore or a license because your local repository already has commits.
+4.	Copy the HTTPS URL. Replace YOUR_USERNAME below and run in your local repository.
+cd /d D:\DevOpsLab\git-journal
+git remote add origin https://github.com/YOUR_USERNAME/git-journal.git
+git remote -v
+git push -u origin main
+5. When Git Credential Manager opens a browser, sign in to the intended GitHub account and authorize the prompt. A GitHub account password is not accepted as a Git HTTPS password. Never paste a token into a repository URL or source file.
+6. Refresh the repository page and inspect its files and commit history.
+git status
+git branch -vv
+
+
+
+Practical 7 Clone a repository and pull an update
+
+Aim: Clone a second working copy and synchronize a remote change.
+1. Clone your repository in a second folder.
+cd /d D:\DevOpsLab
+git clone https://github.com/YOUR_USERNAME/git-journal.git git-journal-copy
+cd git-journal-copy
+git remote -v
+git log --oneline -3
+2. In GitHub, open README.md, click Edit, add the line Updated from GitHub, and commit directly to main for this small solo lab. If branch rules require a pull request, create and merge one instead.
+3. In the second copy, fetch and inspect before pulling. Keep this copy free of local edits.
+git fetch origin
+git log --oneline HEAD..origin/main
+git pull --ff-only
+type README.md
+4. Synchronize the original copy as well.
+cd /d D:\DevOpsLab\git-journal
+git pull --ff-only
+
+
+
+Practical 8 Install JDK and Apache Maven
+
+Aim: Install Java development tools and Maven on Windows.
+
+Procedure
+1.	Download Temurin JDK 21 for Windows x64 from https://adoptium.net/temurin/releases/?version=21. Install it and record the actual JDK directory. This journal uses C:\Program Files\Eclipse Adoptium\jdk-21 as an example only; your folder often includes a full version suffix.
+2.	 Open Start, search Edit the system environment variables, select Environment Variables. Add JAVA_HOME with your actual JDK folder, excluding \bin. Add %JAVA_HOME%\bin to Path. Do not remove existing Path entries.
+3.	 Download the stable Maven 3.9.x Binary zip archive from https://maven.apache.org/download.cgi. Extract it into D:\Tools. Do not download the source archive. Locate the extracted folder that contains bin\mvn.cmd.
+4.	 Add that actual Maven bin folder to Path, for example D:\Tools\apache-maven-3.9.x\bin with x replaced by the installed patch version. Close all old terminals and open a new CMD.
+5.	 Verify the compiler, Java location and Maven runtime.
+java -version
+javac -version
+where java
+where javac
+echo %JAVA_HOME%
+mvn -version
+where mvn
+
+Practical 9 Create a Maven Java project
+
+Aim: Create a Java project with a complete pom.xml and a main class.
+Procedure
+1. Create the project and Java package directories.
+cd /d D:\DevOpsLab
+mkdir student-calculator
+cd student-calculator
+mkdir src\main\java\com\example
+mkdir src\test\java\com\example
+2. Save the following full content as D:\DevOpsLab\student-calculator\pom.xml. Use All Files when saving in Notepad.
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>student-calculator</artifactId>
+  <version>1.0.0</version>
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.example.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+3. Save this class as src\main\java\com\example\App.java. The public class name must match the filename.
+package com.example;
+
+public class App {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Sum = " + add(10, 20));
+    }
+}
+4. From the project root, confirm the file and validate the POM.
+dir pom.xml
+mvn validate
+mvn compile
+
+Practical 10 Use the Maven build lifecycle
+
+Aim: Compile, package, execute and install a project artifact.
+
+Procedure
+1. Compile and execute the class directly.
+mvn clean compile
+java -cp target\classes com.example.App
+2. Package and run the executable JAR.
+mvn package
+dir target\*.jar
+java -jar target\student-calculator-1.0.0.jar
+3. Install the artifact into your local Maven repository.
+mvn install
+dir "%USERPROFILE%\.m2\repository\com\example\student-calculator\1.0.0"
+4. Run clean and observe that target disappears. Rebuild to restore it.
+mvn clean
+dir
+mvn package
+
+
+Practical 11 Write and run JUnit tests
+
+Aim
+Execute three automated tests, observe a deliberate failure and repair it.
+
+Procedure
+1. Save the following code as src\test\java\com\example\AppTest.java.
+package com.example;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AppTest {
+    @Test
+    void addsPositiveNumbers() {
+        assertEquals(30, App.add(10, 20));
+    }
+
+    @Test
+    void addsZero() {
+        assertEquals(7, App.add(7, 0));
+    }
+
+    @Test
+    void addsNegativeNumbers() {
+        assertEquals(-5, App.add(-2, -3));
+    }
+}
+2. Execute tests and locate reports.
+mvn clean test
+dir target\surefire-reports
+type target\surefire-reports\com.example.AppTest.txt
+3. Temporarily change the positive-number assertion from assertEquals(30, ...) to assertEquals(31, ...). Save and run mvn test. Record the failing assertion and nonzero build result. Do not change the correct implementation just to satisfy an incorrect test.
+4. Restore the expected value to 30, save, rerun and package.
+mvn clean verify
+
+
+
+Practical 12 Install and start Jenkins locally
+
+Aim:Run Jenkins LTS with JDK 21 and complete its initial setup.
+
+Procedure
+1. Check https://www.jenkins.io/doc/book/platform-information/support-policy-java/ and choose a current LTS compatible with JDK 21. Download the Generic Java package WAR from https://www.jenkins.io/download/ and save it as D:\DevOpsLab\jenkins\jenkins.war. Create the jenkins directory before saving.
+2. Open a new CMD and start Jenkins. Keep this terminal open.
+mkdir D:\DevOpsLab\jenkins-home
+cd /d D:\DevOpsLab\jenkins
+set "JENKINS_HOME=D:\DevOpsLab\jenkins-home"
+java -jar jenkins.war --httpPort=8080 --httpListenAddress=127.0.0.1
+3. Open http://localhost:8080. The first startup prints an administrator unlock password. Alternatively read it in a second CMD using the command below. Paste it only into the unlock screen; do not include it in journal screenshots.
+type D:\DevOpsLab\jenkins-home\secrets\initialAdminPassword
+4. Select Install suggested plugins. Create an administrator account with a strong password. Set the Jenkins URL to http://localhost:8080/ and complete setup. Keep Jenkins bound to loopback for this local lab.
+5. Open Manage Jenkins > Plugins. Ensure Git, Pipeline including Declarative Pipeline, and JUnit are installed. If installation needs a restart, wait for it to finish. Record the Jenkins version from the interface.
+6. For later sessions, repeat the set JENKINS_HOME and java -jar commands in a fresh CMD. Stop the local instance with Ctrl+C after builds finish. If port 8080 is occupied, restart with --httpPort=8081 and use that URL consistently.
+
+
+
+Practical 13 Configure tools and run a freestyle job
+
+Aim
+Check build tools from Jenkins and execute a basic Windows job.
+
+Procedure
+1. In Manage Jenkins > Tools, configure a JDK named JDK21 with its actual home directory and Maven named Maven3 with the actual Maven installation directory. Disable automatic installation for these local installations. Check the Git installation path. These names are used exactly in later pipelines.
+2. For this isolated, trusted-code lab, ensure the built-in node has one executor. In Manage Jenkins > Nodes > Built-In Node > Configure, set one executor if required and save. Production installations should run builds on separate agents; all jobs here execute on the local Windows node.
+3. Select New Item, enter hello-windows, choose Freestyle project and OK. Under Build Steps choose Execute Windows batch command. Paste:
+echo Jenkins Windows lab
+echo Workspace: %WORKSPACE%
+where git
+git --version
+java -version
+javac -version
+call mvn -version
+4. Save and select Build Now. Open the build number, then Console Output. If a tool is missing, stop Jenkins and restart it from a newly opened CMD after correcting PATH. A tools entry alone does not add Maven to every arbitrary freestyle batch command.
+
+
+
+Practical 14 Pipeline one with basic stages
+
+Aim: Create a Declarative Pipeline with two stages and post-build messages.
+
+Procedure
+1. Select New Item, name it pipeline-hello, choose Pipeline and OK. Under Pipeline select Pipeline script and paste the complete script below.
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps { echo 'First student pipeline' }
+        }
+        stage('Check Windows') {
+            steps {
+                bat 'ver'
+                bat 'git --version'
+            }
+        }
+    }
+    post {
+        success { echo 'All stages completed' }
+        failure { echo 'Read the failing stage console' }
+    }
+}
+2. Save and click Build Now. Open the build and inspect the stage visualization if available and Console Output. Standard console evidence is sufficient if no stage visualization plugin is installed.
+3. Temporarily replace bat ver with bat exit /b 1. Build again and observe the failure message. Restore bat ver and rebuild successfully.
+
+
+
+Practical 15 Pipeline two for checkout test and package
+
+Aim
+Build the GitHub Maven project in separate pipeline stages and publish evidence.
+Procedure
+1. Create a Pipeline job named calculator-pipeline. Select Pipeline script. Paste the script below, replacing YOUR_USERNAME.
+pipeline {
+    agent any
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+    options { disableConcurrentBuilds() }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/YOUR_USERNAME/student-calculator.git'
+            }
+        }
+        stage('Compile') {
+            steps { bat 'call mvn -B clean compile' }
+        }
+        stage('Test') {
+            steps { bat 'call mvn -B test' }
+        }
+        stage('Package') {
+            steps { bat 'call mvn -B package -DskipTests' }
+        }
+        stage('Run') {
+            steps {
+                bat 'java -jar target/student-calculator-1.0.0.jar'
+            }
+        }
+    }
+    post {
+        always {
+            junit testResults: 'target/surefire-reports/*.xml',
+                  allowEmptyResults: true
+        }
+        success {
+            archiveArtifacts artifacts: 'target/*.jar',
+                             fingerprint: true
+        }
+    }
+}
+2. For private SCM, add credentialsId: github-read to the git step as another named argument with correct commas. 
+3. Save and Build Now. Check the console of each stage. Verify that Test runs three tests, Run prints Sum = 30, and the JAR is archived.
+4. Note that allowEmptyResults permits report publishing after an early checkout or compile failure. It does not erase a failed Maven command. In a successful run, explicitly check that the report contains the expected tests; an empty report is not valid completion.
+
+Practical 16 Pipeline three stored in a Jenkinsfile
+
+Aim
+Store the CI pipeline in GitHub and load it through Pipeline script from SCM.
+
+Procedure
+1. Save the following complete script as Jenkinsfile with no extension in the project root. deleteDir clears only the current Jenkins workspace before a fresh checkout; do not point this job at your personal source folder.
+pipeline {
+    agent any
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 15, unit: 'MINUTES')
+        skipDefaultCheckout(true)
+    }
+    parameters {
+        booleanParam(name: 'RUN_APP', defaultValue: true,
+                     description: 'Run the packaged calculator')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                deleteDir()
+                checkout scm
+            }
+        }
+        stage('Verify') {
+            steps { bat 'call mvn -B clean verify' }
+        }
+        stage('Run') {
+            when { expression { return params.RUN_APP } }
+            steps {
+                bat 'java -jar target/student-calculator-1.0.0.jar'
+            }
+        }
+    }
+    post {
+        always {
+            junit testResults: 'target/surefire-reports/*.xml',
+                  allowEmptyResults: true
+        }
+        success {
+            archiveArtifacts artifacts: 'target/*.jar',
+                             fingerprint: true
+        }
+        failure { echo 'Inspect checkout, compilation and test logs' }
+    }
+}
+2. Commit and push the file.
+cd /d D:\DevOpsLab\student-calculator
+git switch main
+git pull --ff-only
+git add Jenkinsfile
+git commit -m "Add CI pipeline as code"
+git push origin main
+3. Create a Pipeline job named calculator-ci. Under Pipeline, choose Pipeline script from SCM. SCM: Git; Repository URL: your student-calculator HTTPS URL; Branch Specifier: */main; Script Path: Jenkinsfile. Choose github-read only if the repository is private.
+4. Save and Build Now once. The first run registers the parameter; subsequent runs show Build with Parameters. Run with RUN_APP true and then false. Confirm that false skips only the Run stage; verification and artifact publication still execute.
+5. Inspect the checkout commit hash, three-test report and archived JAR. The 15-minute timeout is a lab value; on a slow first dependency download, investigate and adjust it deliberately. This job demonstrates CI and artifact production, not deployment to a server.
+
