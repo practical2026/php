@@ -1,0 +1,201 @@
+App.java
+package com.example;
+
+public class App {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Sum = " + add(10, 20));
+    }
+}
+
+AppTest.java
+
+package com.example;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AppTest {
+
+    @Test
+    void addsPositiveNumbers() {
+        assertEquals(30, App.add(10, 20));
+    }
+
+    @Test
+    void addsZero() {
+        assertEquals(7, App.add(7, 0));
+    }
+
+    @Test
+    void addsNegativeNumbers() {
+        assertEquals(-5, App.add(-2, -3));
+    }
+}
+
+freestyle.project(jenkins)
+
+echo Jenkins Windows lab
+echo Workspace: %WORKSPACE%
+where git
+git --version
+java -version
+javac -version
+call mvn -version
+
+pipeline-hello
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'First student pipeline'
+            }
+        }
+
+        stage('Check Windows') {
+            steps {
+                bat 'ver'
+                bat 'git --version'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'All stages completed'
+        }
+        failure {
+            echo 'Read the failing stage console'
+        }
+    }
+}
+
+pipeline Jenkinsflie
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 15, unit: 'MINUTES')
+        skipDefaultCheckout(true)
+    }
+
+    parameters {
+        booleanParam(
+            name: 'RUN_APP',
+            defaultValue: true,
+            description: 'Run the packaged calculator'
+        )
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                deleteDir()
+                checkout scm
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                bat 'call mvn -B clean verify'
+            }
+        }
+
+        stage('Run') {
+            when {
+                expression { return params.RUN_APP }
+            }
+            steps {
+                bat 'java -jar target/student-calculator-1.0.0.jar'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit testResults: 'target/surefire-reports/*.xml',
+                  allowEmptyResults: true
+        }
+
+        success {
+            archiveArtifacts artifacts: 'target/*.jar',
+                             fingerprint: true
+        }
+
+        failure {
+            echo 'Inspect checkout, compilation and test logs'
+        }
+    }
+}
+
+Mavens project in git 
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+
+    options {
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/YOUR_USERNAME/student-calculator.git'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                bat 'call mvn -B clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'call mvn -B test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'call mvn -B package -DskipTests'
+            }
+        }
+
+        stage('Run') {
+            steps {
+                bat 'java -jar target/student-calculator-1.0.0.jar'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit testResults: 'target/surefire-reports/*.xml',
+                  allowEmptyResults: true
+        }
+
+        success {
+            archiveArtifacts artifacts: 'target/*.jar',
+                             fingerprint: true
+        }
+    }
+}
