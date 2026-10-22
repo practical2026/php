@@ -1,0 +1,501 @@
+Q1. Create files, configure `.gitignore`, and verify
+
+1. Open Command Prompt and initialize a new repository:
+
+```bat
+mkdir q1-repo
+cd q1-repo
+git init
+mkdir build
+
+```
+
+2. Create the required files:
+
+```bat
+echo temporary output>build\output.log
+echo Local note>draft.txt
+
+```
+
+3. Create `.gitignore`: Open Notepad, add the following lines, and save the file as `.gitignore` (All Files) in your `q1-repo` folder.
+
+```text
+build/
+*.log
+.env
+
+```
+
+4. Verify the ignore rules and check staged changes:
+
+```bat
+git check-ignore -v build/output.log
+git add .gitignore draft.txt
+git diff --staged
+
+```
+
+### Q2. Create branch `feature-study-plan`, commit, and merge
+
+1. Initialize a repository and create a baseline commit:
+
+```bat
+mkdir q2-repo
+cd q2-repo
+git init
+echo Baseline>README.md
+git add README.md
+git commit -m "Baseline commit"
+
+```
+
+2. Create and switch to the feature branch:
+
+```bat
+git switch -c feature-study-plan
+
+```
+
+3. Add the file, commit, and merge into main:
+
+```bat
+echo Study Git before Jenkins>study-plan.txt
+git add study-plan.txt
+git commit -m "Add study plan"
+git switch main
+git merge feature-study-plan
+
+```
+
+4. Show the graphical log:
+
+```bat
+git log --oneline --graph --all
+
+```
+
+### Q3. Create GitHub repository and push local repository
+
+1. Go to GitHub in your browser and create a new repository named `git-journal`. Do not add a README or `.gitignore`.
+2. Open Command Prompt, create a local repository, and make a commit:
+
+```bat
+mkdir git-journal
+cd git-journal
+git init
+echo Journal start>README.md
+git add README.md
+git commit -m "First commit"
+
+```
+
+3. Link the remote and push (replace `YOUR_USERNAME` with your actual GitHub username):
+
+```bat
+git remote add origin https://github.com/YOUR_USERNAME/git-journal.git
+git push -u origin main
+
+```
+
+### Q4. Clone, edit from GitHub, and synchronize
+
+1. Clone the repository into a second folder:
+
+```bat
+git clone https://github.com/YOUR_USERNAME/git-journal.git git-journal-copy
+cd git-journal-copy
+
+```
+
+2. In your web browser, go to your GitHub repository, open `README.md`, click the pencil icon to edit, add a new line, and click "Commit changes".
+3. Back in Command Prompt, synchronize the local copy with the remote change:
+
+```bat
+git fetch origin
+git pull --ff-only
+
+```
+
+### Q5. Create a controlled merge conflict and resolve it
+
+1. Set up the baseline repository:
+
+```bat
+mkdir q5-repo
+cd q5-repo
+git init
+echo Course: DevOps>course.txt
+git add course.txt
+git commit -m "Add course baseline"
+
+```
+
+2. Make a change on the feature branch:
+
+```bat
+git switch -c feature-course
+echo Course: DevOps with Git>course.txt
+git add course.txt
+git commit -m "Describe Git course"
+
+```
+
+3. Make a conflicting change on main and attempt to merge:
+
+```bat
+git switch main
+echo Course: DevOps with Jenkins>course.txt
+git add course.txt
+git commit -m "Describe Jenkins course"
+git merge feature-course
+
+```
+
+4. Resolve the conflict: Open `course.txt` in Notepad. Delete all conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) and edit the text to exactly `Course: DevOps with Git and Jenkins`. Save the file.
+5. Finalize the merge:
+
+```bat
+git add course.txt
+git commit -m "Resolve course title conflict"
+
+```
+
+### Q6. Demonstrate unstage, discard, and revert
+
+1. Initialize repository and add a baseline:
+
+```bat
+mkdir q6-repo
+cd q6-repo
+git init
+echo Baseline>README.md
+git add README.md
+git commit -m "Baseline"
+
+```
+
+2. Unstage and discard a temporary edit:
+
+```bat
+echo Temporary lab edit>>README.md
+git add README.md
+git restore --staged README.md
+git restore README.md
+
+```
+
+3. Revert an unwanted commit:
+
+```bat
+echo Incorrect practice entry>wrong.txt
+git add wrong.txt
+git commit -m "Add incorrect practice entry"
+git revert --no-edit HEAD
+
+```
+
+### Q7. Create Maven project and validate/compile
+
+1. Create the project directory structure:
+
+```bat
+mkdir student-calculator
+cd student-calculator
+mkdir src\main\java\com\example
+
+```
+
+2. Copy the provided `pom.xml` into the `student-calculator` folder.
+3. Save `App.java` (using the provided code) inside `src\main\java\com\example\`.
+4. Validate and compile the project:
+
+```bat
+mvn validate
+mvn compile
+
+```
+
+### Q8. Execute Maven lifecycle
+
+1. Navigate to your existing Maven project folder (`student-calculator`):
+
+```bat
+cd student-calculator
+
+```
+
+2. Execute the lifecycle phases:
+
+```bat
+mvn clean compile
+mvn package
+java -jar target\student-calculator-1.0.0.jar
+mvn install
+
+```
+
+3. Verify the artifact in the local repository:
+
+```bat
+dir "%USERPROFILE%\.m2\repository\com\example\student-calculator\1.0.0"
+
+```
+
+### Q9. Create Freestyle job `hello-windows`
+
+1. Open Jenkins in your browser and click **New Item**.
+2. Enter the name `hello-windows`, select **Freestyle project**, and click **OK**.
+3. Scroll down to the **Build Steps** section.
+4. Click **Add build step** and select **Execute Windows batch command**.
+5. Paste the following batch commands:
+
+```bat
+echo Workspace: %WORKSPACE%
+where git
+git --version
+java -version
+javac -version
+call mvn -version
+
+```
+
+6. Click **Save**, then click **Build Now**. View the output in the Console Output.
+
+### Q10. Create `AppTest.java`, run test, fail, and repair
+
+1. Navigate to your Maven project and create the test directory:
+
+```bat
+cd student-calculator
+mkdir src\test\java\com\example
+
+```
+
+2. Create `AppTest.java` inside `src\test\java\com\example` containing the 3 provided JUnit tests.
+3. Run the tests and observe the report:
+
+```bat
+mvn clean test
+dir target\surefire-reports
+type target\surefire-reports\com.example.AppTest.txt
+
+```
+
+4. **Create deliberate failure:** Open `AppTest.java` and change an assertion to an incorrect value (e.g., `assertEquals(31, App.add(10, 20));`). Save and run `mvn clean test` to observe the failure.
+5. **Repair:** Change the value back to 30, save, and run `mvn clean test` to verify success.
+
+### Q11. Create Declarative Pipeline `pipeline-hello`
+
+1. In Jenkins, click **New Item**, name it `pipeline-hello`, select **Pipeline**, and click **OK**.
+2. Scroll to the **Pipeline** section, ensure Definition is **Pipeline script**, and paste:
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps { echo 'First student pipeline' }
+        }
+        stage('Check Windows') {
+            steps {
+                bat 'ver'
+                bat 'git --version'
+            }
+        }
+    }
+    post {
+        success { echo 'All stages completed' }
+        failure { echo 'Read the failing stage console' }
+    }
+}
+
+```
+
+3. Click **Save** and **Build Now**.
+4. **Fail and restore:** Click **Configure**, change `bat 'ver'` to `bat 'exit /b 1'`, save, and click **Build Now**. It will fail. Click **Configure**, change it back to `bat 'ver'`, save, and build to restore.
+
+### Q12. Write `Jenkinsfile` and push to GitHub
+
+1. In your local `student-calculator` project directory, create a file named exactly `Jenkinsfile` (no file extension).
+2. Paste the following pipeline code into it:
+
+```groovy
+pipeline {
+    agent any
+    tools { jdk 'JDK21'; maven 'Maven3' }
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 15, unit: 'MINUTES')
+        skipDefaultCheckout(true)
+    }
+    parameters {
+        booleanParam(name: 'RUN_APP', defaultValue: true, description: 'Run the packaged calculator')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                deleteDir()
+                checkout scm
+            }
+        }
+        stage('Verify') {
+            steps { bat 'call mvn -B clean verify' }
+        }
+    }
+}
+
+```
+
+3. Push to GitHub:
+
+```bat
+git add Jenkinsfile
+git commit -m "Add Jenkinsfile"
+git push origin main
+
+```
+
+### Q13. Create Pipeline `calculator-pipeline` using Pipeline script
+
+1. Create your `student-calculator` Maven project locally and push it to a new GitHub repository.
+2. In Jenkins, click **New Item**, name it `calculator-pipeline`, select **Pipeline**, and click **OK**.
+3. Under **Pipeline script**, paste the following (replace `YOUR_USERNAME`):
+
+```groovy
+pipeline {
+    agent any
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
+    }
+    stages {
+        stage('Checkout') {
+            steps { git branch: 'main', url: 'https://github.com/YOUR_USERNAME/student-calculator.git' }
+        }
+        stage('Compile') { steps { bat 'call mvn -B clean compile' } }
+        stage('Test') { steps { bat 'call mvn -B test' } }
+        stage('Package') { steps { bat 'call mvn -B package -DskipTests' } }
+        stage('Run') { steps { bat 'java -jar target/student-calculator-1.0.0.jar' } }
+    }
+    post {
+        always { junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true }
+        success { archiveArtifacts artifacts: 'target/*.jar', fingerprint: true }
+    }
+}
+
+```
+
+4. Click **Save** and **Build Now**.
+
+### Q14. Create Pipeline job `calculator-ci` from SCM
+
+1. *Prerequisite: Your `student-calculator` repository must be on GitHub and contain a `Jenkinsfile` with parameters and stages.*
+2. In Jenkins, click **New Item**, name it `calculator-ci`, select **Pipeline**, and click **OK**.
+3. Scroll down to Pipeline, change **Definition** to **Pipeline script from SCM**.
+4. Set **SCM** to **Git**.
+5. Enter your GitHub **Repository URL** (`[https://github.com/YOUR_USERNAME/student-calculator.git](https://github.com/YOUR_USERNAME/student-calculator.git)`).
+6. Set **Branch Specifier** to `*/main` and **Script Path** to `Jenkinsfile`.
+7. Click **Save** and **Build Now**.
+8. After the first build, click **Build with Parameters**, uncheck `RUN_APP` (false), and build again to verify the artifact archiving while skipping the Run stage.
+
+### Q15. Create repo, add `.gitignore`, branch, conflict, push
+
+1. Initialize repository and add ignore rules:
+
+```bat
+mkdir q15-repo
+cd q15-repo
+git init
+echo build/>.gitignore
+git add .gitignore
+git commit -m "Add gitignore"
+
+```
+
+2. Set baseline and branch:
+
+```bat
+echo Baseline>course.txt
+git add course.txt
+git commit -m "Baseline course"
+git switch -c feature-conflict
+echo Feature Edit>course.txt
+git commit -am "Feature edit"
+
+```
+
+3. Create conflict:
+
+```bat
+git switch main
+echo Main Edit>course.txt
+git commit -am "Main edit"
+git merge feature-conflict
+
+```
+
+4. Resolve: Open `course.txt`, manually remove markers, type a resolved string, save, and commit:
+
+```bat
+git add course.txt
+git commit -m "Resolved conflict"
+
+```
+
+5. Create a GitHub repo and push:
+
+```bat
+git remote add origin https://github.com/YOUR_USERNAME/q15-repo.git
+git push -u origin main
+
+```
+
+### Q16. Maven project, JUnit, Jenkinsfile, SCM Pipeline
+
+1. **Create Maven Project locally:**
+
+```bat
+mkdir student-calculator
+cd student-calculator
+mkdir src\main\java\com\example
+mkdir src\test\java\com\example
+git init
+
+```
+
+2. Copy `pom.xml`, create `App.java`, and create `AppTest.java` (with JUnit tests) in their respective directories.
+3. **Write `Jenkinsfile`:** Create a file named `Jenkinsfile` in the root folder:
+
+```groovy
+pipeline {
+    agent any
+    tools { jdk 'JDK21'; maven 'Maven3' }
+    stages {
+        stage('Checkout') { steps { checkout scm } }
+        stage('Build & Test') { steps { bat 'call mvn -B clean verify' } }
+    }
+    post {
+        always { junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true }
+        success { archiveArtifacts artifacts: 'target/*.jar', fingerprint: true }
+    }
+}
+
+```
+
+4. **Push to GitHub:** Create an empty repository on GitHub, then execute:
+
+```bat
+git add .
+git commit -m "Complete project"
+git remote add origin https://github.com/YOUR_USERNAME/student-calculator.git
+git push -u origin main
+
+```
+
+5. **Jenkins SCM Pipeline:**
+* In Jenkins, create **New Item** -> `q16-pipeline` -> **Pipeline**.
+* Definition: **Pipeline script from SCM**.
+* SCM: **Git** -> Enter your Repository URL.
+* Branch: `*/main`. Script Path: `Jenkinsfile`.
+* **Save** and **Build Now**.
